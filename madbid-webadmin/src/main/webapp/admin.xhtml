@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:cl="http://java.sun.com/jsf/composite/components">
+
+<f:view contentType="text/html">
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="EmulateIE8"/>
+            <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+            <title>#{msg['common.adminPageTitle']}</title>
+        </f:facet>
+
+        <!--<h:outputStylesheet library="default" name="css/common.css"/>-->
+        <h:outputStylesheet library="css" name="thunderbid.css"/>
+        <h:outputScript library="js" name="validation.js" />
+        <h:outputScript library="js" name="templatesUtils.js" />
+        <!--     <script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+    </h:head>
+
+
+    <h:body>
+
+        <h:outputStylesheet library="default" name="css/def1.css"/>
+        <h:outputStylesheet library="default" name="css/syntaxhighlighter.css"/>
+        <p:layout fullPage="true">
+
+            <p:layoutUnit id="top" position="north" size="50">
+                <h:form>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="#{msg['common.yes']}" type="button" styleClass="ui-confirmdialog-yes"
+                                         icon="ui-icon-check"/>
+                        <p:commandButton value="#{msg['common.no']}" type="button" styleClass="ui-confirmdialog-no"
+                                         icon="ui-icon-close"/>
+                    </p:confirmDialog>
+
+                    <p:messages id="messages" showDetail="true"/>
+                    <p:menubar>
+                        <p:submenu label="#{msg['common.crud']}">
+                            <p:menuitem id="users" value="#{msg['common.users']}"
+                                        actionListener="#{menu.onClick}" icon="ui-icon-person"/>
+                            <p:menuitem id="items" value="#{msg['common.items']}"
+                                        actionListener="#{menu.onClick}" icon="ui-icon-tag"/>
+                            <p:menuitem id="auctions" value="#{msg['common.auctions']}"
+                                        actionListener="#{menu.onClick}" icon="ui-icon-extlink"/>
+                            <p:menuitem id="notificationTemplates" value="#{msg['common.campaign.templates']}"
+                                        oncomplete="registerPlaceholderClickEvent();"
+                                        actionListener="#{menu.onClick}" icon="ui-icon-mail-open"/>
+                            <p:menuitem id="regularCampaigns" value="#{msg['common.regular.campaigns']}"
+                                        actionListener="#{menu.onClick}" icon="ui-icon-mail-closed"/>
+                            <!--<p:menuitem id="discounts" value="#{msg['common.discounts']}"-->
+                                        <!--actionListener="#{menu.onClick}" icon="ui-icon-calendar"/>-->
+                            <p:menuitem id="payments" value="#{msg['common.payments']}"
+                                        actionListener="#{menu.onClick}" icon="ui-icon-tag"/>
+                            <p:menuitem id="userMessages" value="#{msg['common.messages']}"
+                                        actionListener="#{menu.onClick}" icon="ui-icon-person"/>
+                        </p:submenu>
+                        <p:submenu label="#{msg['common.processes']}">
+
+                        </p:submenu>
+                        <p:submenu label="#{msg['common.statistics']}">
+
+                        </p:submenu>
+
+                        <p:submenu label="#{msg['common.help']}">
+                        </p:submenu>
+
+                        <f:facet name="options">
+                            <h:outputText id="loggedUser" value="#{adminController.getCurrentUser()}"/>
+                            <p:spacer width="10"/>
+                            <p:commandButton value="#{msg['logout']}" ajax="true"
+                                             actionListener="#{adminController.logout()}" icon="ui-icon-extlink"/>
+                        </f:facet>
+                    </p:menubar>
+
+                    <p:hotkey bind="ctrl+shift+c"/>
+
+                </h:form>
+            </p:layoutUnit>
+
+            <p:layoutUnit id="bottom" position="south" size="50">
+                <h:panelGroup layout="block"
+                              style="width: 100% !important; height: 100% !important; background-color: #808080 !important;">
+                    <h:outputText styleClass="text-footer" value="#{msg['login.footer.text2']}" style="color: #ffffff"/>
+                </h:panelGroup>
+            </p:layoutUnit>
+
+            <!--<p:layoutUnit id="left" position="west" size="300" resizable="true" closable="true" collapsible="true"
+                          header="Options" minSize="200">
+                <p:accordionPanel>
+                    <p:tab title="Menu 1">
+                        <br/>
+                        <p:calendar mode="inline" navigator="none"/>
+                        <br/>
+                    </p:tab>
+
+                    <p:tab title="Menu 2">
+                        <h:outputText value="Menu 2 Content"/>
+                    </p:tab>
+
+                    <p:tab title="Menu 3">
+                        <h:outputText value="Menu 3 Content"/>
+                    </p:tab>
+                </p:accordionPanel>
+            </p:layoutUnit>-->
+
+            <p:layoutUnit id="center" position="center"
+                          style="width: 100%; height: 100%">
+
+                <!-- Flat view i.e. without Tabs -->
+                <!--<p:panel id="mainPanel" header="#{mainPanelBean.header}" rendered="#{mainPanelBean.rendered}">
+                    <ui:include src="#{mainPanelBean.url}">
+                        <ui:param name="managedBean" value="#{mainPanelBean.bean}"/>
+                        <ui:param name="uniqueIndex" value="#{mainPanelBean.index}"/>
+                    </ui:include>
+                </p:panel>-->
+                <p:tabView id="tabPanel" scrollable="false" dynamic="true" cache="false"
+                           activeIndex="#{tabView.activeIndex}"
+                           style="width: 99%; height: 98%; border: none">
+                    <p:ajax event="tabClose" listener="#{tabView.onTabClose}"/>
+                    <p:ajax event="tabChange" listener="#{tabView.onTabChange}"/>
+
+                    <!--ToDo: should be composed as a component -->
+                    <p:tab title="#{msg['common.statistics']}" closable="false">
+                    </p:tab>
+
+                    <c:forEach items="#{tabView.tabs}" var="tab" varStatus="loop">
+                        <p:tab titletip="#{tab.id}" title="#{tab.label}" closable="#{tab.bean.closable}">
+                            <ui:include src="#{tab.url}">
+                                <ui:param name="managedBean" value="#{tab.bean}"/>
+                                <ui:param name="uniqueIndex" value="#{loop.index}"/>
+                            </ui:include>
+                        </p:tab>
+                    </c:forEach>
+                </p:tabView>
+
+
+            </p:layoutUnit>
+
+            <!--<p:layoutUnit position="east" size="200" header="#{msg['common.communication']}" resizable="true"
+                          closable="false" collapsible="true"
+                          effect="drop">
+            </p:layoutUnit>-->
+
+            <p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+                <f:facet name="start">
+                    <p:graphicImage value="resources/default/1_0/img/loading.gif"/>
+                </f:facet>
+
+                <f:facet name="complete">
+                    <h:outputText value=""/>
+                </f:facet>
+            </p:ajaxStatus>
+
+        </p:layout>
+    </h:body>
+
+</f:view>
+</HTML>
+

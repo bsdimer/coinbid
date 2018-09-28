@@ -1,0 +1,188 @@
+i:hover {
+    cursor: pointer;
+}
+
+ul.icons {
+    list-style: none;   
+}
+
+ul.icons li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+i.arrow-left-yellow {
+    background: url(../img/icons/Arrow-left-yellow.png) no-repeat;
+    display: block;
+    height: 25px;
+    width: 25px;
+}
+
+i.arrow-right-yellow {
+    background: url(../img/icons/Arrow-right-yellow.png) no-repeat;
+    display: block;
+    height: 25px;
+    width: 25px;
+}
+
+i.arrow-down-yellow {
+    background: url(../img/icons/Arrow-down-yellow.png) no-repeat;
+    display: block;
+    height: 25px;
+    width: 26px;
+}
+
+i.arrow-up-yellow {
+    background: url(../img/icons/Arrow-up-yellow.png) no-repeat;
+    display: block;
+    height: 25px;
+    width: 26px;
+}
+
+i.arrow-left {
+    background: url(../img/icons/Arrow-left.png) no-repeat;
+    display: block;
+    height: 16px;
+    width: 9px;
+}
+
+i.arrow-right {
+    background: url(../img/icons/Arrow-right.png) no-repeat;
+    display: block;
+    height: 16px;
+    width: 9px;
+}
+
+i.arrow-down {
+    background: url(../img/icons/Arrow-down.png) no-repeat;
+    display: block;
+    height: 10px;
+    width: 16px;
+}
+
+i.arrow-up {
+    background: url(../img/icons/Arrow-up.png) no-repeat;
+    display: block;
+    height: 16px;
+    width: 16px;
+}
+
+i.sound-on {
+    background: url(../img/icons/Sound-on.png) no-repeat;
+    display: block;
+    height: 17px;
+    width: 16px;
+}
+
+i.sound-off {
+    background: url(../img/icons/Sound-off.png) no-repeat;
+    display: block;
+    height: 17px;
+    width: 17px;
+}
+
+i.profile {
+    background: url(../img/icons/Profile.png) no-repeat;
+    display: block;
+    height: 17px;
+    width: 17px;
+}
+
+i.cog {
+    background: url(../img/icons/Cog.png) no-repeat;
+    display: block;
+    height: 17px;
+    width: 17px;
+}
+
+i.cancel {
+    background: url(../img/icons/Cancel.png) no-repeat;
+    display: block;
+    height: 18px;
+    width: 18px;
+}
+
+i.tick {
+    background: url(../img/icons/Tick.png) no-repeat;   
+    display: block;
+    height: 17px;
+    width: 24px;
+}
+
+i.alarm {
+    background: url(../img/icons/Alarm.png) no-repeat;
+    display: block;
+    height: 17px;
+    width: 18px;
+}
+
+i.power {
+    background: url(../img/icons/Power.png) no-repeat;
+    display: block;
+    height: 17px;
+    width: 16px;
+}
+
+i.ok-circle {
+    background: url(../img/icons/Ok-circle.png) no-repeat;
+    display: block;
+    height: 17px;
+    width: 17px;
+}
+
+i.cancel-circle {
+    background: url(../img/icons/Cancel-circle.png) no-repeat;
+    display: block;
+    height: 17px;
+}
+
+i.refresh {
+    background: url(../img/icons/Refresh.png) no-repeat;
+    display: block;
+    height: 17px;
+    width: 17px;
+}
+
+i.facebook {
+    background: url(../img/icons/Facebook-yellow.png) no-repeat;
+    display: block;
+    height: 22px;
+    width: 23px;
+}
+
+i.google-plus {
+    background: url(../img/icons/GooglePlus-yellow.png) no-repeat;
+    display: block;
+    height: 22px;
+    width: 23px;
+}
+
+i.twitter {
+    background: url(../img/icons/Twitter-yellow.png) no-repeat;
+    display: block;
+    height: 22px;
+    width: 23px;
+}
+
+i.skype {
+    background: url(../img/icons/Skype-yellow.png) no-repeat;
+    display: block;
+    height: 22px;
+    width: 22px;
+}
+
+i.social {
+    -webkit-transition: .8s ease;
+    -moz-transition: .8s ease;
+    -o-transition: .8s ease;
+    transition: .8s ease;   
+}
+
+i.social:hover {
+    cursor: pointer;
+    filter: type(value);
+    -webkit-filter: brightness(0%);
+    -moz-filter: brightness(0%);
+    -ms-filter: brightness(0%);
+    -o-filter: brightness(0%);
+}

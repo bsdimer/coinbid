@@ -1,0 +1,122 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html"
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:pe="http://primefaces.org/ui/extensions"
+              xmlns:components="http://java.sun.com/jsf/composite/components"
+              xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true" type="com.madbid.admin.controller.UserMessageController"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:form>
+    <ui:param name="showDetailsPanel" value="#{cc.attrs.managedBean.showDetails}"/>
+    <p:messages severity="warn, error" autoUpdate="true" showSummary="true"/>
+
+    <p:toolbar style="width: 70%">
+        <f:facet name="left">
+            <p:commandButton title="#{msg['common.send']}" value="#{msg['common.send']}"
+                             icon="ui-icon-mail-closed"
+                             process="@none"
+                             update="@none"
+                             oncomplete="PF('sendUserMessageDialog').show()"/>
+            <p:separator/>
+        </f:facet>
+    </p:toolbar>
+
+    <p:dataTable id="userMessagesTable_#{cc.attrs.uniqueIndex}" var="userMessage" value="#{cc.attrs.managedBean.userMessages}"
+                 resizableColumns="true" lazy="true" selectionMode="single" style="width: 70%"
+                 selection="#{cc.attrs.managedBean.selectedUserMessage}" rowKey="#{userMessage.id}"
+                 editable="true" widgetVar="userMessagesTable"
+                 sortMode="Single" sortBy="#{userMessage.id}" sortOrder="descending"
+                 styleClass="small-font" draggableColumns="true"
+                 rows="10" paginator="true" paginatorPosition="top"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 currentPageReportTemplate="#{msg['common.results']}: {startRecord} - {endRecord} #{msg['common.from']} {totalRecords}, #{msg['common.page']}: {currentPage}/{totalPages}"
+                 emptyMessage="#{msg['common.no.user.messages.found']}"
+                 filteredValue="#{cc.attrs.managedBean.filteredUserMessages}">
+        <p:ajax event="rowSelect" update="@form" listener="#{cc.attrs.managedBean.onRowSelect}" />
+        <f:facet name=" header">
+            Съобщения
+        </f:facet>
+
+        <p:column filterBy="#{userMessage.id}" headerText="Id" sortBy="#{userMessage.id}">
+            <h:outputText value="#{userMessage.id}"/>
+        </p:column>
+
+        <p:column filterBy="#{userMessage.message.created}" headerText="#{msg['common.datetime']}" sortBy="#{userMessage.message.created}">
+            <h:outputText
+                    value="#{userMessage.message.created.toString('dd/MM/yyyy HH:mm:ss')}"/>
+        </p:column>
+
+        <p:column filterBy="#{userMessage.message.subject}" headerText="#{msg['common.subject']}" sortBy="#{userMessage.message.subject}">
+            <h:outputText value="#{userMessage.message.subject}"/>
+        </p:column>
+
+        <p:column filterBy="#{userMessage.message.text}" headerText="#{msg['common.text']}" sortBy="#{userMessage.message.text}">
+            <h:outputText value="#{userMessage.message.text}"/>
+        </p:column>
+
+        <p:column filterBy="#{userMessage.message.sender.fullName}" headerText="#{msg['common.From']}">
+            <h:outputText value="#{userMessage.message.sender.fullName}"/>
+        </p:column>
+    </p:dataTable>
+    <c:if test="${showDetailsPanel eq 'true'}">
+        <p:panel id="messageDetailsPanel" widgetVar="messageDetailsPanel" header="#{msg['common.details']}" style="margin-bottom:20px">
+            <h:panelGrid columns="2" cellpadding="10">
+                <h:outputText escape="false" styleClass="preformatted" value="#{cc.attrs.managedBean.selectedUserMessage.message.text}" />
+            </h:panelGrid>
+        </p:panel>
+    </c:if>
+</h:form>
+
+<p:dialog id="sendUserMessageDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.message']}"
+          widgetVar="sendUserMessageDialog"
+          resizable="true" showEffect="fade" hideEffect="explode" style="width: auto; height: auto"
+          closeOnEscape="true">
+    <h:form>
+        <p:growl severity="info" autoUpdate="true"  showSummary="true"/>
+        <p:messages id="sendUserMessageMessages_#{cc.attrs.uniqueIndex}" severity="warn, error" autoUpdate="true" showSummary="true"/>
+
+        <h:panelGrid columns="2" styleClass="label, value">
+            <h:outputText value="#{msg['common.sendToAll']}" for="sendToAll"/>
+            <p:selectBooleanButton id="sendToAll" value="#{cc.attrs.managedBean.sendToAll}" onLabel="#{msg['common.yes']}" offLabel="#{msg['common.no']}" style="width:60px">
+                <p:ajax event="change" immediate="true" update="sendTo"/>
+            </p:selectBooleanButton>
+            <p:outputLabel value="#{msg['common.sendTo']}" for="sendTo" />
+            <p:autoComplete id="sendTo"
+                            style="width: 100%"
+                            cache="true" cacheTimeout="6000"
+                            multiple="true"
+                            disabled="#{cc.attrs.managedBean.sendToAll}"
+                            value="#{cc.attrs.managedBean.selectedUsers}"
+                            completeMethod="#{autoComplete.autoCompleteUser}"
+                            var="user" itemLabel="#{user.fullName}" itemValue="#{user}" converter="#{userConverter}" forceSelection="true">
+                <p:column style="width:50%">
+                    <h:outputText value="#{user.fullName}" />
+                </p:column>
+
+                <p:column>
+                    <h:outputText value="#{user.email}" />
+                </p:column>
+            </p:autoComplete>
+            <p:outputLabel value="#{msg['common.subject']}" for="subject" />
+            <p:inputText id="subject" value="#{cc.attrs.managedBean.subject}" style="width: 100%"/>
+        </h:panelGrid>
+
+        <h:panelGrid columns="1" styleClass="panel-no-border">
+            <p:editor id="textEditor" widgetVar="textEditorWidget" value="#{cc.attrs.managedBean.text}" width="600" />
+            <p:commandButton title="#{msg['common.send']}" value="#{msg['common.send']}" actionListener="#{cc.attrs.managedBean.send}"
+                             ajax="true"/>
+        </h:panelGrid>
+    </h:form>
+</p:dialog>
+
+</composite:implementation>
+
+</ui:component>

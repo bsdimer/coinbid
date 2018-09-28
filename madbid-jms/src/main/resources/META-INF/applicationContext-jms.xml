@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	   http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <context:annotation-config/>
+    <bean class="com.madbid.messaging.config.AppConfig"/>
+
+    <bean id="brokerConnectionFactory"
+          class="org.apache.activemq.ActiveMQConnectionFactory"
+          p:brokerURL="tcp://localhost:61616"/>
+
+    <bean id="cachingBrokerConnectionFactory"
+          class="org.springframework.jms.connection.CachingConnectionFactory"
+          p:targetConnectionFactory-ref="brokerConnectionFactory"
+          p:sessionCacheSize="10"/>
+
+    <bean id="updateAuctionsTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="updateAuctions"/>
+    </bean>
+
+    <!--
+    <bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="queue"/>
+    </bean>-->
+
+    <bean id="queueJMSTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <constructor-arg ref="cachingBrokerConnectionFactory"/>
+        <property name="pubSubDomain" value="false"/>
+    </bean>
+
+    <bean id="topicJMSTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <constructor-arg ref="cachingBrokerConnectionFactory"/>
+        <property name="pubSubDomain" value="true"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,75 @@
+.preformatted {
+    white-space: pre-wrap;
+}
+
+.alignTop {
+    vertical-align: top;
+}
+
+.pictures-table thead tr {
+    display:none;
+}
+
+.pictures-table th, .pictures-table thead, .pictures-table tr {
+    border: hidden !important;
+}
+
+.accordion-without-padding .ui-accordion-content {
+    padding: 0px !important;
+}
+
+.panel-without-padding .ui-panel-content {
+    padding: 0px !important;
+}
+
+.thunderbid-file-upload {
+    height: 0px;
+    margin-bottom: 31px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    padding: 0px;
+}
+
+.thunderbid-file-upload .ui-fileupload-content {
+    visibility: hidden !important;
+}
+
+.ui-layout-north {
+    z-index: 20 !important;
+    overflow: visible !important;
+}
+
+.ui-layout-north .ui-layout-unit-content {
+    overflow: visible !important;
+}
+
+.panel-grid-top-aligned td {
+    vertical-align: top;
+}
+
+.pink-background {
+    background-color: pink !important;
+    background: inherit !important;
+}
+
+.white-background {
+    background-color: white;
+}
+
+.small-font {
+    font-size: 13px !important;
+}
+
+.panel-no-border {
+    border: none !important;
+}
+
+.panel-no-border .ui-panel-content {
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+.panel-no-border .ui-panelgrid-cell {
+    border: none !important;
+}

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+       http://www.springframework.org/schema/jms
+       http://www.springframework.org/schema/jms/spring-jms.xsd
+       ">
+
+    <jms:annotation-driven/>
+
+    <bean id="brokerConnectionFactory"
+          class="org.apache.activemq.ActiveMQConnectionFactory"
+          p:brokerURL="tcp://localhost:61616"/>
+
+    <bean id="cachingBrokerConnectionFactory"
+          class="org.springframework.jms.connection.CachingConnectionFactory"
+          p:targetConnectionFactory-ref="brokerConnectionFactory"
+          p:sessionCacheSize="10"/>
+
+    <bean id="updateAuctionsTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="updateAuctions"/>
+    </bean>
+
+    <!--
+    <bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="queue"/>
+    </bean>-->
+
+    <bean id="queueJMSTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <constructor-arg ref="cachingBrokerConnectionFactory"/>
+        <property name="pubSubDomain" value="false"/>
+    </bean>
+
+    <bean id="topicJMSTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <constructor-arg ref="cachingBrokerConnectionFactory"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="messageConverter" ref="customMessageConverter"/>
+    </bean>
+
+<!--
+    <bean id="executorSC" class="org.springframework.messaging.support.ExecutorSubscribableChannel"/>
+    <bean id="simpMessageTemplate" class="org.springframework.messaging.simp.SimpMessagingTemplate">
+        <constructor-arg ref="executorSC"/>
+    </bean>
+-->
+
+    <bean id="jmsListenerContainerFactory"
+          class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
+        <property name="connectionFactory" ref="cachingBrokerConnectionFactory"/>
+        <property name="destinationResolver" ref="customDestinationResolver"/>
+        <property name="concurrency" value="3-10"/>
+        <!--<property name="messageConverter" ref="customMessageConverter"/>-->
+    </bean>
+
+    <bean id="cachingDestinationResolver" class="org.springframework.jms.support.destination.JndiDestinationResolver">
+        <property name="cache" value="true"/>
+        <property name="fallbackToDynamicDestination" value="true"/>
+    </bean>
+
+    <bean id="customDestinationResolver" class="com.madbid.web.jms.JMSDestinationResolver"/>
+
+    <bean id="customMessageConverter" class="com.madbid.core.service.converter.AuctionDTOMessageConverter"/>
+
+
+</beans>

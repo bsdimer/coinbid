@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<f:view>
+    <ui:composition>
+        <p:dataTable id="itemsTable" var="item" value="#{itemController.items}" resizableColumns="true" editable="true"
+                     styleClass="small-font" draggableColumns="true"
+                     rows="10" paginator="true" paginatorPosition="top" rowsPerPageTemplate="5,10,15"
+                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     currentPageReportTemplate="#{msg['common.results']}: {startRecord} - {endRecord} #{msg['common.from']} {totalRecords}, #{msg['common.page']}: {currentPage}/{totalPages}"
+                     emptyMessage="#{msg['common.no.items.found']}" filteredValue="#{itemController.filteredItems}">
+            <p:ajax event="rowEdit" listener="#{itemController.editItem}" />
+
+            <p:column filterBy="#{item.id}" headerText="Id" sortBy="#{item.id}">
+                <h:outputText value="#{item.id}"/>
+            </p:column>
+
+            <p:column filterBy="#{item.name}" headerText="#{msg['common.name']}" sortBy="#{item.name}">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText for="itemNameEdit" value="#{item.name}"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:inputText id="itemNameEdit" value="#{item.name}" style="width:100%"
+                                     required="true" requiredMessage="#{msg['required.items.name']}"/>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column filterBy="#{item.description}" headerText="#{msg['common.description']}">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText for="descriptionEdit" value="#{item.description}"/></f:facet>
+                    <f:facet name="input"><p:inputText id="descriptionEdit" value="#{item.description}" style="width:100%"/>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column filterBy="#{item.retailPrice}" headerText="#{msg['item.retail.price']}" sortBy="#{item.retailPrice}">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText for="retailPriceEdit" value="#{item.retailPrice}"/></f:facet>
+                    <f:facet name="input">
+                        <p:inputText id="retailPriceEdit" value="#{item.retailPrice}"
+                                     required="true" requiredMessage="#{msg['required.items.retail.price']}"
+                                     style="width:100%"/>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column filterBy="#{item.shippingPrice}" headerText="#{msg['item.shipping.price']}" sortBy="#{item.shippingPrice}">
+                <h:outputText value="#{item.shippingPrice}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.availability']}">
+                <h:outputText value="#{item.itemInventories.size()}"/>
+            </p:column>
+
+            <p:column style="width:32px">
+                <p:rowEditor />
+            </p:column>
+        </p:dataTable>
+    </ui:composition>
+</f:view>
+</html>

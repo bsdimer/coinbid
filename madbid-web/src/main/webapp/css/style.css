@@ -1,0 +1,48 @@
+.preformatted {
+    white-space: pre-wrap;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.content {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.sign-in-text {
+    padding-right: 2em;
+}
+
+.social-button-row {
+    padding-top: 1.0em;
+}
+
+.buttonPackets {
+    width: 100%;
+    cursor: pointer;
+    background-color: #ffff00;
+    text-align: center;
+    height: auto;
+}
+
+.icon-flipped {
+    transform: scaleX(-1) !important;
+    -moz-transform: scaleX(-1) !important;
+    -webkit-transform: scaleX(-1) !important;
+    -ms-transform: scaleX(-1) !important;
+}
+
+.text-bolder {
+     font-weight: bolder !important;
+ }
+
+.text-normal {
+    font-weight: normal !important;
+}
+
+.ui-widget {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    font-size: 14px !important;
+}

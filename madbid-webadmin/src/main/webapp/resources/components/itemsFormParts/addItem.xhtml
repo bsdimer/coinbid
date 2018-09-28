@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+<f:view>
+    <ui:composition>
+        <h:panelGrid styleClass="grid" columns="2" cellpadding="5">
+            <p:outputLabel for="name" style="font-weight: bold" value="#{msg['common.name']}"/>
+            <p:inputText id="name" value="#{itemController.item.name}" required="true"
+                         requiredMessage="#{msg['required.items.name']}"/>
+
+            <p:outputLabel for="retailPrice" style="font-weight: bold" value="#{msg['item.retail.price']}"/>
+            <p:inputText id="retailPrice" value="#{itemController.item.retailPrice}"
+                         required="true" requiredMessage="#{msg['required.items.retail.price']}"
+                         onkeypress="allowOnlyNumeric(event)">
+                <!--<f:convertNumber minIntegerDigits="1" maxIntegerDigits="6" maxFractionDigits="2"-->
+                <!--minFractionDigits="2"/>-->
+                <!--<f:validateDoubleRange minimum="0.1"/>-->
+            </p:inputText>
+
+            <p:outputLabel for="description" style="font-weight: bold" value="#{msg['common.description']}"/>
+            <p:editor id="description" widgetVar="descriptionWidget" value="#{itemController.item.description}"
+                      width="800"/>
+
+            <p:commandButton value="#{msg['common.create']}"
+                             action="#{itemController.createItem}" update="@form"/>
+            <p:commandButton value="#{msg['common.cancel']}"
+                             action="#{itemController.toggleAddItemPanel}" immediate="true" update="@form"/>
+        </h:panelGrid>
+
+    </ui:composition>
+</f:view>
+</html>

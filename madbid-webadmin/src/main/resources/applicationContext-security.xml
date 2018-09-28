@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:sec="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+          http://www.springframework.org/schema/security
+          http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <sec:http pattern="/css/**" security="none"/>
+    <sec:http pattern="/img/**" security="none"/>
+    <sec:http pattern="/javax.faces.resource/**" security="none"/>
+    <sec:http pattern="/resources/**" security="none"/>
+
+    <sec:http auto-config="true" use-expressions="true">
+        <sec:intercept-url pattern="/admin.xhtml" access="hasRole('ROLE_ADMIN')"/>
+        <sec:intercept-url pattern="/login.xhtml" access="permitAll"/>
+        <sec:intercept-url pattern="/**" access="isAuthenticated()"/>
+        <sec:form-login login-page="/"
+                        authentication-failure-handler-ref="loginFailureHandler"
+                        authentication-success-handler-ref="loginSuccessHandler"/>
+        <sec:logout
+                invalidate-session="true"
+                delete-cookies="JSESSIONID,SPRING_SECURITY_REMEMBER_ME_COOKIE"
+                logout-success-url="/"/>
+        <sec:custom-filter ref="authenticationFilter" after="FORM_LOGIN_FILTER"/>
+        <sec:session-management>
+            <!--<sec:concurrency-control error-if-maximum-exceeded="true"/>-->
+        </sec:session-management>
+
+    </sec:http>
+
+    <!--<sec:authentication-manager alias="authenticationManager">
+        <sec:authentication-provider user-service-ref="customUserDetailService"/>
+    </sec:authentication-manager>-->
+    <sec:authentication-manager alias="authenticationManager">
+        <sec:authentication-provider user-service-ref="userDetailsService">
+            <sec:password-encoder ref="passwordEncoder"/>
+        </sec:authentication-provider>
+    </sec:authentication-manager>
+
+
+    <sec:global-method-security pre-post-annotations="enabled"/>
+
+    <beans:bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors"
+                factory-method="noOpText"/>
+    <beans:bean id="userDetailsService" class="com.madbid.core.security.service.UserDetailsService"
+                autowire="constructor"/>
+
+    <!--<beans:bean id="customUserDetailService" class="com.madbid.core.security.service.UserDetailsService"/>-->
+    <beans:bean id="loginSuccessHandler" class="com.madbid.security.LoginSuccessHandler"/>
+    <beans:bean id="loginFailureHandler" class="com.madbid.security.LoginFailureHandler"/>
+    <beans:bean id="authenticationFilter" class="com.madbid.security.CustomAuthenticationFilter">
+        <beans:property name="authenticationManager" ref="authenticationManager"/>
+    </beans:bean>
+
+</beans:beans>

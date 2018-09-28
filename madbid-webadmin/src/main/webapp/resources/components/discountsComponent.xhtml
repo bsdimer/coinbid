@@ -1,0 +1,37 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html"
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:pe="http://primefaces.org/ui/extensions"
+              xmlns:components="http://java.sun.com/jsf/composite/components"
+              xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true" type="com.madbid.admin.controller.DiscountController"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:form>
+    <p:messages severity="warn, error" autoUpdate="true" showSummary="true"/>
+
+    <p:toolbar style="margin-bottom: 1em">
+        <f:facet name="left">
+            <p:commandButton title="#{msg['common.create']}" value="#{msg['common.create']}" icon="ui-icon-person"
+                             process="@none"
+                             update="@none"
+                             oncomplete=""/>
+            <p:commandButton title="#{msg['common.save']}" value="#{msg['common.save']}" icon="ui-icon-person"
+                             process="@none"
+                             update="@none"
+                             oncomplete=""/>
+            <p:separator/>
+        </f:facet>
+    </p:toolbar>
+    <h:outputText value="After creation of discount MailChimp camplaign will be created and send to all subscribed users"/>
+</h:form>
+</composite:implementation>
+
+</ui:component>

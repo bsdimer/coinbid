@@ -1,0 +1,277 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html"
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:pe="http://primefaces.org/ui/extensions"
+              xmlns:components="http://java.sun.com/jsf/composite/components"
+              xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true" type="com.madbid.admin.controller.PaymentsController"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:form>
+
+    <p:messages severity="warn, error" autoUpdate="true" showSummary="true"/>
+
+    <p:toolbar style="margin-bottom: 1em">
+        <f:facet name="left">
+            <p:commandButton title="#{msg['common.add']}" value="#{msg['common.add']}" icon="ui-icon-person"
+                             process="@none"
+                             update="@none"
+                             oncomplete="PF('addNewUserDialog').show()"/>
+            <p:separator/>
+        </f:facet>
+    </p:toolbar>
+
+    <p:dataTable id="paymentsTable_#{cc.attrs.uniqueIndex}" var="payment"
+                 value="#{cc.attrs.managedBean.payments}"
+                 resizableColumns="true" lazy="true" widgetVar="paymentsTable_#{cc.attrs.uniqueIndex}"
+                 editable="false" rowKey="#{user.id}"
+                 sortMode="Single" sortBy="#{user.id}" sortOrder="descending"
+                 selection="#{cc.attrs.managedBean.selectedPayment}" selectionMode="single"
+                 styleClass="small-font" draggableColumns="true"
+                 rows="10" paginator="true" paginatorPosition="top" rowsPerPageTemplate="5,10,15"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 currentPageReportTemplate="#{msg['common.results']}: {startRecord} - {endRecord} #{msg['common.from']} {totalRecords}, #{msg['common.page']}: {currentPage}/{totalPages}"
+                 emptyMessage="#{msg['common.no.payments.found']}"
+                 filteredValue="#{cc.attrs.managedBean.filteredPayments}">
+        <!--<p:ajax event="rowEdit" listener="#{cc.attrs.managedBean.edit}"/>-->
+
+        <p:column filterBy="#{payment.id}" headerText="Id" sortBy="#{payment.id}">
+            <h:outputText value="#{payment.id}"/>
+        </p:column>
+
+        <p:column filterBy="#{payment.saleType}" headerText="#{msg['label.payment.saleType']}"
+                  sortBy="#{payment.saleType}">
+            <h:outputText value="#{payment.saleType.value}"/>
+        </p:column>
+
+        <p:column filterBy="#{payment.created}" headerText="#{msg['label.payment.created']}"
+                  sortBy="#{payment.created}">
+            <h:outputText value="#{payment.created.toString('dd/MM/yyyy HH:mm:ss')}"/>
+        </p:column>
+
+        <p:column filterBy="#{payment.modified}" headerText="#{msg['label.payment.modified']}"
+                  sortBy="#{payment.modified}">
+            <h:outputText value="#{payment.modified.toString('dd/MM/yyyy HH:mm:ss')}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['label.payment.amount']}">
+            <h:outputText value="#{payment.amount} #{payment.currency}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['label.payment.data']}">
+            <h:outputText value="#{payment.data}"/>
+        </p:column>
+
+
+        <p:column>
+            <p:commandButton id="selectPaymentButton_#{cc.attrs.uniqueIndex}"
+                             update="@form:paymentDetailsPG_#{cc.attrs.uniqueIndex}"
+                             oncomplete="PF('paymentDetailDialog_#{cc.attrs.uniqueIndex}').show()" icon="ui-icon-person"
+                             title="View">
+                <f:setPropertyActionListener value="#{payment}" target="#{cc.attrs.managedBean.selectedPayment}"/>
+            </p:commandButton>
+            <p:commandButton id="showPaymentUserButton_#{cc.attrs.uniqueIndex}"
+                             update="@form:paymentDetailsPG_#{cc.attrs.uniqueIndex}"
+                             oncomplete="PF('userDetailDialog_#{cc.attrs.uniqueIndex}').show()"
+                             icon="ui-icon-transfer-e-w"
+                             title="View">
+                <f:setPropertyActionListener value="#{payment}" target="#{cc.attrs.managedBean.selectedPayment}"/>
+            </p:commandButton>
+        </p:column>
+
+    </p:dataTable>
+
+    <p:dialog id="paymentDetailDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.coins']}"
+              widgetVar="paymentDetailDialog_#{cc.attrs.uniqueIndex}"
+              resizable="true" showEffect="fade" hideEffect="explode" style="width: auto; height: auto"
+              closeOnEscape="true" dynamic="true">
+
+        <p:accordionPanel id="paymentDetailsPG_#{cc.attrs.uniqueIndex}">
+            <c:forEach items="#{cc.attrs.managedBean.selectedPayment.transactions}" var="transaction">
+                <p:tab title="#{msg['label.payment.transaction']}# #{transaction.id}">
+                    <h:panelGrid columns="2" columnClasses="label, value">
+                        <p:outputLabel value="ID" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.id}"/>
+                        <p:outputLabel value="#{msg['common.created']}:" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.created}"/>
+                        <p:outputLabel value="#{msg['common.modified']}:" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.modified}"/>
+                        <p:outputLabel value="#{msg['common.expiredAt']}:" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.expireAt}"/>
+                        <p:outputLabel value="#{msg['common.amount']}" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.amount} #{transaction.currency}"/>
+                        <p:outputLabel value="#{msg['label.transaction.paymentType']}:" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.paymentType}"/>
+                        <p:outputLabel value="#{msg['common.description']}:" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.description}"/>
+                        <p:outputLabel value="#{msg['common.state']}:" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.transactionState}"/>
+                        <p:outputLabel value="#{msg['label.transaction.id']}:" style="font-weight: bold"/>
+                        <p:outputLabel value="#{transaction.transactionId}"/>
+                    </h:panelGrid>
+                </p:tab>
+            </c:forEach>
+        </p:accordionPanel>
+
+    </p:dialog>
+
+    <p:dialog id="userDetailDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.user']}"
+              widgetVar="userDetailDialog_#{cc.attrs.uniqueIndex}"
+              resizable="true" showEffect="fade" hideEffect="explode" style="width: auto; height: auto"
+              closeOnEscape="true" dynamic="true">
+        <h:panelGrid id="userDetailPG_#{cc.attrs.uniqueIndex}" columns="4" cellpadding="4" style="margin:0 auto;">
+
+            <p:fieldset legend="#{msg['common.main']}" style="margin-top: 10px; !important">
+                <h:panelGrid id="printArea_#{cc.attrs.uniqueIndex}" columns="2" columnClasses="label, value">
+                    <p:outputLabel value="#{msg['common.username']}" style="font-weight: bold"/>
+                    <p:outputLabel value="#{cc.attrs.managedBean.selectedPayment.payer.username}"/>
+                    <p:outputLabel value="#{msg['common.email']}" style="font-weight: bold"/>
+                    <p:outputLabel value="#{cc.attrs.managedBean.selectedPayment.payer.email}"/>
+
+                    <p:outputLabel value="#{msg['common.fullname']}" style="font-weight: bold"/>
+                    <p:outputLabel
+                            value="#{cc.attrs.managedBean.selectedPayment.payer.firstName} #{cc.attrs.managedBean.selectedPayment.payer.lastName}"/>
+                    <p:outputLabel value="#{msg['common.mobileNumber']}" style="font-weight: bold"/>
+                    <p:outputLabel value="#{cc.attrs.managedBean.selectedPayment.payer.mobileNumber}"/>
+
+                    <p:outputLabel value="#{msg['common.created']}:" style="font-weight: bold"/>
+                    <p:outputLabel value="#{cc.attrs.managedBean.selectedPayment.payer.created}"/>
+                    <p:outputLabel value="#{msg['common.modified']}:" style="font-weight: bold"/>
+                    <p:outputLabel value="#{cc.attrs.managedBean.selectedPayment.payer.modified}"/>
+
+                    <p:outputLabel value="#{msg['common.addresses']}:" style="font-weight: bold"/>
+                    <p:outputLabel/>
+
+                    <c:forEach items="#{cc.attrs.managedBean.selectedPayment.payer.addresses}" var="address">
+                        <p:outputLabel value="#{address}"/>
+                    </c:forEach>
+
+                </h:panelGrid>
+            </p:fieldset>
+
+        </h:panelGrid>
+    </p:dialog>
+
+    <!--<p:dialog id="coinsDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.coins']}"
+              widgetVar="coinsAddDialog"
+              resizable="true" modal="false" showEffect="fade" hideEffect="explode" style="width: auto; height: auto"
+              closeOnEscape="true">
+
+        <h:panelGrid id="coinsAddPG_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4" style="margin:0 auto;">
+            <p:outputLabel value="#{msg['common.quantity']}"/>
+            <p:spinner id="coins2add_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.coins2Add}"
+                       immediate="true">
+                <f:convertNumber minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                                 minFractionDigits="2"/>
+                <f:validateLongRange minimum="0" maximum="1000000"/>
+            </p:spinner>
+            <p:outputLabel value="#{msg['common.amount']}"/>
+            <p:inputText id="coinsValue_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.currencyValue}"
+                         immediate="true">
+                <f:convertNumber minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                                 minFractionDigits="2"/>
+                <f:validateDoubleRange minimum="0.0" maximum="10000.00"/>
+            </p:inputText>
+            <p:outputLabel value="#{msg['common.currency']}"/>
+            <p:selectOneMenu id="coinsCurrency_#{cc.attrs.uniqueIndex}"
+                             value="#{cc.attrs.managedBean.selectedCurrency}">
+                <f:selectItems value="#{autoComplete.allCurrencies}" var="currency"
+                               itemValue="#{currency}"/>
+            </p:selectOneMenu>
+            <p:commandButton value="#{msg['common.add']}" action="#{cc.attrs.managedBean.addCoins}" ajax="true"
+                             update="@form"
+                             process="@this, @form:coins2add_#{cc.attrs.uniqueIndex}, @form:coinsValue_#{cc.attrs.uniqueIndex}"/>
+        </h:panelGrid>
+    </p:dialog>
+
+    -->
+</h:form>
+
+<!--<p:dialog id="addNewUserDialog" header="#{msg['common.addNewUser']}"
+          widgetVar="addNewUserDialog"
+          resizable="true" showEffect="fade" hideEffect="explode" style="width: auto; height: auto"
+          closeOnEscape="true">
+    <h:form>
+        <p:growl id="addNewUserDialogGrowlMessages" severity="info" autoUpdate="true" showSummary="true"/>
+        <p:messages id="formMessages_#{cc.attrs.uniqueIndex}" severity="warn, error" autoUpdate="true"
+                    showSummary="true"/>
+        <h:panelGrid id="addNewUserPanel_#{cc.attrs.uniqueIndex}" styleClass="grid" columns="4" cellpadding="5">
+            <p:outputLabel for="username_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                           value="#{msg['common.username']}"/>
+            <p:inputText id="username_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.registration.username}"
+                         required="true"
+                         requiredMessage="#{msg['required.users.username']}"/>
+
+            <p:outputLabel for="email_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                           value="#{msg['common.email']}"/>
+            <p:inputText id="email_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.registration.email}"
+                         required="true"
+                         requiredMessage="#{msg['required.users.email']}"
+                         validatorMessage="#{msg['validation.email']}">
+                <f:validateRegex for="email_#{cc.attrs.uniqueIndex}"
+                                 pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"/>
+                <p:ajax event="blur" render="formMessages_#{cc.attrs.uniqueIndex}"/>
+            </p:inputText>
+
+            <p:outputLabel for="firstName_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                           value="#{msg['common.name']}"/>
+            <p:inputText id="firstName_#{cc.attrs.uniqueIndex}"
+                         value="#{cc.attrs.managedBean.registration.firstName}" required="true"
+                         requiredMessage="#{msg['required.users.firstname']}"/>
+
+            <p:outputLabel for="lastName_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                           value="#{msg['common.lastName']}"/>
+            <p:inputText id="lastName_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.registration.lastName}"
+                         required="true"
+                         requiredMessage="#{msg['required.users.lastname']}"/>
+
+            <p:outputLabel for="password_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                           value="#{msg['common.password']}"/>
+            <p:password id="password_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.registration.password}"
+                        required="true"
+                        requiredMessage="#{msg['required.users.password']}"
+                        feedback="true" promptLabel="#{msg['validation.password.prompt']}"
+                        weakLabel="#{msg['validation.password.weak']}"
+                        goodLabel="#{msg['validation.password.good']}"
+                        strongLabel="#{msg['validation.password.strong']}"/>
+
+            <p:outputLabel for="mobileNumber_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                           value="#{msg['common.mobile']}"/>
+            <p:inputMask id="mobileNumber_#{cc.attrs.uniqueIndex}" required="true"
+                         requiredMessage="#{msg['required.users.mobile']}"
+                         value="#{cc.attrs.managedBean.registration.mobileNumber}" mask="999 99 999 999"/>
+
+            <p:outputLabel for="newsSubscribed_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                           value="#{msg['common.news.subscribed']}"/>
+            <p:selectBooleanButton id="newsSubscribed_#{cc.attrs.uniqueIndex}"
+                                   value="#{cc.attrs.managedBean.registration.newsSubscribed}"
+                                   onLabel="#{msg['common.yes']}" offLabel="#{msg['common.no']}"
+                                   style="width:60px"/>
+
+            <p:outputLabel for="role_#{cc.attrs.uniqueIndex}" value="#{msg['common.role']}"
+                           style="font-weight: bold"/>
+            <p:selectOneMenu id="role_#{cc.attrs.uniqueIndex}" required="true"
+                             requiredMessage="#{msg['required.users.role']}"
+                             value="#{cc.attrs.managedBean.registration.role}">
+                <f:selectItem itemLabel="#{msg['common.role.choose']}" itemValue=""/>
+                <f:selectItems value="#{cc.attrs.managedBean.roles}" var="role"
+                               itemLabel="#{msg[role]}"/>
+            </p:selectOneMenu>
+            <p:commandButton value="#{msg['common.create']}"
+                             action="#{cc.attrs.managedBean.create}"
+                             update="@form, @widgetVar(userTable_#{cc.attrs.uniqueIndex})"/>
+        </h:panelGrid>
+    </h:form>
+</p:dialog>-->
+
+
+</composite:implementation>
+
+</ui:component>

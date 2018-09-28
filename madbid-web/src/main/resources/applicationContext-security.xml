@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:http="http://www.springframework.org/schema/security" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- Static resources such as CSS and JS files are ignored by Spring Security -->
+    <security:http pattern="/static/**" security="none"/>
+    <security:http pattern="/fonts/**" security="none"/>
+    <security:http pattern="/css/**" security="none"/>
+    <security:http pattern="/img/**" security="none"/>
+    <security:http pattern="/js/**" security="none"/>
+    <security:http pattern="/select/**" security="none"/>
+    <security:http pattern="/iCheck-1.x/**" security="none"/>
+    <!--<security:http pattern="/stompEndpoint/**" security="none" create-session="always"/>-->
+
+    <!--suppress SpringSecurityFiltersConfiguredInspection -->
+    <security:http use-expressions="true">
+        <!-- Enables Spring Security CSRF protection -->
+        <security:csrf/>
+        <security:headers>
+            <security:frame-options policy="SAMEORIGIN"/>
+        </security:headers>
+        <!-- Configures the form login -->
+        <security:form-login
+                login-page="/index"
+                login-processing-url="/login/authenticate"
+                authentication-failure-handler-ref="loginFailureHandler"
+                username-parameter="username"
+                password-parameter="password"/>
+        <!-- Configures the logout function -->
+        <security:logout
+                logout-url="/logout"
+                logout-success-url="/index"
+                delete-cookies="JESSIONID"/>
+        <!-- Anyone can access these urls -->
+        <security:intercept-url pattern="/auth/**" access="permitAll"/>
+        <security:intercept-url pattern="/image/**" access="permitAll"/>
+        <security:intercept-url pattern="/login" access="permitAll"/>
+        <security:intercept-url pattern="/index" access="permitAll"/>
+        <security:intercept-url pattern="/faq" access="permitAll"/>
+        <security:intercept-url pattern="/signin/**" access="permitAll"/>
+        <security:intercept-url pattern="/signup/**" access="permitAll"/>
+        <security:intercept-url pattern="/user/register/**" access="permitAll"/>
+        <security:intercept-url pattern="/stompEndpoint/**" access="permitAll"/>
+        <security:intercept-url pattern="/user/register-confirmation/**" access="permitAll"/>
+        <security:intercept-url pattern="/auction/approvewinner/**" access="permitAll"/>
+
+        <!-- The rest of our application is protected. -->
+        <security:intercept-url pattern="/**" access="isAuthenticated()"/>
+
+        <!-- Adds social authentication filter to the Spring Security filter chain. -->
+        <security:custom-filter ref="socialAuthenticationFilter" before="PRE_AUTH_FILTER"/>
+    </security:http>
+
+    <bean id="loginFailureHandler" class="com.madbid.web.security.LoginFailureHandler"/>
+    <!--
+        Configures the authentication manager bean which processes authentication
+        requests.
+    -->
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider user-service-ref="userDetailsService">
+            <security:password-encoder ref="passwordEncoder"/>
+        </security:authentication-provider>
+
+        <security:authentication-provider ref="socialAuthenticationProvider"/>
+    </security:authentication-manager>
+
+    <!-- This is used to hash the password of the user. -->
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+        <constructor-arg index="0" value="10"/>
+    </bean>
+
+    <bean id="connectionFactoryLocator"
+          class="org.springframework.social.security.SocialAuthenticationServiceRegistry">
+        <property name="authenticationServices">
+            <list>
+                <bean class="org.springframework.social.facebook.security.FacebookAuthenticationService">
+                    <constructor-arg value="${facebook.app.id}"/>
+                    <constructor-arg value="${facebook.app.secret}"/>
+                </bean>
+                <bean class="org.springframework.social.twitter.security.TwitterAuthenticationService">
+                    <constructor-arg value="${twitter.consumer.key}"/>
+                    <constructor-arg value="${twitter.consumer.secret}"/>
+                </bean>
+                <bean class="org.springframework.social.google.security.GoogleAuthenticationService">
+                    <constructor-arg value="${google.consumer.key}"/>
+                    <constructor-arg value="${google.consumer.secret}"/>
+                    <property name="defaultScope" value="profile"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="usersConnectionRepository"
+          class="org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="connectionFactoryLocator"/>
+        <constructor-arg ref="textEncryptor"/>
+    </bean>
+
+    <bean id="connectionRepository" factory-method="createConnectionRepository"
+          factory-bean="usersConnectionRepository" scope="request">
+        <constructor-arg value="#{request.userPrincipal.name}"/>
+        <aop:scoped-proxy proxy-target-class="false"/>
+    </bean>
+
+    <!--
+        Configures the social authentication filter which integrates Spring Social
+        with Spring Security.
+    -->
+    <bean id="socialAuthenticationFilter" class="com.madbid.web.social.MadbidSocialAuthenticationFilter">
+        <constructor-arg index="0" ref="authenticationManager"/>
+        <constructor-arg index="1" ref="userIdSource"/>
+        <constructor-arg index="2" ref="usersConnectionRepository"/>
+        <constructor-arg index="3" ref="connectionFactoryLocator"/>
+
+        <!-- Sets the url of the registration form. -->
+        <property name="signupUrl" value="/user/register"/>
+    </bean>
+
+    <!--
+        Configures the social authentication provider which processes authentication requests
+        made by using supported social authentication services (FB, Twitter and so on).
+    -->
+    <bean id="socialAuthenticationProvider" class="org.springframework.social.security.SocialAuthenticationProvider"
+          depends-on="usersConnectionRepository; socialUserDetailsService">
+        <constructor-arg index="0" ref="usersConnectionRepository"/>
+        <constructor-arg index="1" ref="socialUserDetailsService"/>
+    </bean>
+
+    <!--
+        This bean is used to load the user specific data when social sign in
+        is used.
+    -->
+    <bean id="socialUserDetailsService" class="com.madbid.core.security.service.SocialUserDetailsService">
+        <constructor-arg index="0" ref="userDetailsService"/>
+    </bean>
+
+    <!--
+        This bean encrypts the authorization authentication-managers of the connection. In
+        our example, the authorization details are stored as plain text.
+        DO NOT USE THIS IN PRODUCTION.
+    -->
+    <bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" factory-method="noOpText"/>
+
+    <!-- This bean is load the user specific data when form login is used. -->
+    <bean id="userDetailsService" class="com.madbid.core.security.service.UserDetailsService" autowire="constructor"/>
+
+    <!--
+        This bean determines the account ID of the user. The example application
+        uses the username as the account ID.
+    -->
+    <bean id="userIdSource" class="org.springframework.social.security.AuthenticationNameUserIdSource"/>
+
+</beans>

@@ -1,0 +1,459 @@
+@media (max-width: 991px) {
+	#brand {
+		margin-top: -11px;
+	}
+
+	.nav.navbar-nav li {
+		margin-left: -11px;
+	}
+
+	.main {
+		margin-left: -110px;
+	}
+
+	.main li {
+		margin-left: -11px;
+		font-size: 12px;
+	}
+
+	.user-coins {
+		margin-top: -15px;
+	}
+
+	.fixed {
+		margin-top: -21px;
+	}
+
+	/* Promo product */
+	.promo-image {
+		max-width: 400px;
+	}
+
+	.stamp {
+		top: 180px;
+	}
+
+	.Specification p {
+		font-size: 13px;
+	}
+
+	.outbid {
+		margin-top: 80px;
+		margin-left: 10px;
+	}
+
+	.outbid .button-yellow {
+		top: 420px;
+		/*margin-left: -0px;*/
+		/*left: 0;*/
+	}
+
+	.btn-dark {
+		font-size: 9px;
+	}
+
+	/* Products */
+	.product .thumb img {
+		margin-top: 30px;
+		max-width: 150px;
+	}
+
+	.product .button-bid {
+		padding-left: 30px;
+		padding-right: 20px;
+	}
+
+	.product .timer {
+		color: #363636;
+		font-weight: bold;
+		margin-right: 21px;
+		margin-left: -36px;
+		font-size: 11px;
+	}
+
+	.product .timer:before {
+		content: "";
+		background-image: url('../img/Timer.png');
+		display: block;
+		width: 21px;
+		height: 21px;
+		position: absolute;
+		left: 0px;
+		top: 190px;
+	}
+
+	.product .coins {
+		color: #363636;
+		font-weight: bold;
+		font-size: 11px;
+	}
+
+	.product .coins:before {
+		content: "";
+		background-image: url('../img/Coin.png');
+		display: block;
+		width: 22px;
+		height: 23px;
+		position: absolute;
+		left: 66px;
+		top: 190px;
+	}
+
+	.how-it-works h4 {
+		font-size: 15px;
+	}
+
+	.how-it-works p {
+		font-size: 13px;
+	}
+
+	.left-max {
+		left: -145px;
+	}
+
+	.in-the-middle {
+		position: absolute; 
+		left: 125px;
+	}
+
+	.right-max {
+		right: -122px;
+	}
+
+    .left-offset {
+        margin-left: 3em;
+    }
+
+	/* Winners */
+	.winner .prize {
+		background-image: url(../img/Winner.png);
+		background-repeat: no-repeat;
+		width: 154px;
+		height: 156px;
+		position: absolute;
+		right: -70px;
+		top: 65px;
+	}
+
+	.winner .prize img {
+		max-width: 110px;
+		max-height: 110px;
+		position: absolute;
+		top: 35px;
+		left: 25px;
+	}
+
+	.winner .prize .price {
+		position: absolute;
+		bottom: 0;
+		font-size: 17px;
+		font-weight: bold;
+		right: 40px;
+	}
+
+	.winner h5 {
+		font-weight: bold;
+	}
+}
+
+
+@media (min-width: 992px) and (max-width: 1199px) {
+	.main {
+		margin-left: -160px;
+	}
+
+	.outbid .button-yellow {
+		right: 20px;
+		top: 335px;
+	}
+
+	.outbid .outbuy {
+		font-size: 13px;
+	}
+	
+	.btn-dark {
+		font-size: 13px;
+	}
+
+	.product .timer {
+		color: #363636;
+		font-weight: bold;
+		margin-right: 26px;
+		margin-left: -21px;
+		font-size: 13px;
+	}
+
+	.product .timer:before {
+		content: "";
+		background-image: url('../img/Timer.png');
+		display: block;
+		width: 21px;
+		height: 21px;
+		position: absolute;
+		left: 20px;
+		top: 190px;
+	}
+
+	.product .coins {
+		color: #363636;
+		font-weight: bold;
+		font-size: 13px;
+	}
+
+	.product .coins:before {
+		content: "";
+		background-image: url('../img/Coin.png');
+		display: block;
+		width: 22px;
+		height: 23px;
+		position: absolute;
+		left: 98px;
+		top: 190px;
+	}
+
+	.auction-price a.button-yellow {
+		position: absolute;
+		right: 20px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	.auction-price span {
+		font-size: 35px;
+		margin-top: 5px;
+		margin-right: 50px; 
+		display: inline-block;
+	}
+
+	.dark-grey-price {
+		font-size: 13px;
+		margin-left: 5px;
+	}
+
+	.promo-image-single {
+		max-width: 400px;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+	.main {
+		margin-left: -150px;
+	}
+
+	.promo-image-single {
+		max-width: 300px;
+		margin-top: 50px;
+	}
+
+	.auction-price a.button-yellow {
+		position: absolute;
+		right: 20px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	.auction-price span {
+		font-size: 17px;
+		margin-top: 22px;
+		margin-left: -50px
+		/*margin-right: 10px; */
+		display: inline-block;
+	}
+
+	.dark-grey-price {
+		font-size: 13px;
+		margin-left: 0px;
+	}
+}
+
+@media (max-width: 768px) {
+	.main {
+		margin-left: -90px;
+	}
+
+	.main li {
+		margin-left: -20px;
+		font-size: 8px;
+	}
+
+	.btn-dark {
+		font-size: 8px;
+	}
+
+	.promo-image {
+		max-width: 150px;
+	}
+
+	#brand-image {
+		max-width: 70px;
+	}
+
+	h3 {
+		font-size: 15px;
+	}
+
+	.Specification p, .Stock-price {
+		font-size: 10px;
+	}
+
+	.stamp {
+		top: 90px;
+	}
+
+	.stamp span {
+		font-size: 20px;
+		margin-top: -5px;
+	}
+
+	.stamp img {
+		max-width: 80px;
+	}
+
+	.current-price .price {
+		font-size: 25px;
+	}
+
+	.outbid {
+		margin-left: -170px;
+		margin-top: -150px;
+	}
+
+	.outbid .button-yellow {
+		top: 190px;
+		/*left: -130px;*/
+		/*right: -50px;*/
+		/*left: 50px;*/
+		/*margin-left: -90px;*/
+		margin-right: 50px;
+		padding-left: 20px;
+		padding-right: 15px
+	}
+
+	.outbid .outbuy {
+		font-size: 10px;
+		margin-bottom: 40px;
+	}
+
+	.spacing {
+		margin-top: 20px;
+		margin-left: 0;
+	}
+
+	.product {
+		text-align: center;
+	}
+
+	.product .thumb {
+		display: block;
+		height: 60px;
+	}
+
+	.product .thumb img {
+		max-height: 50px;
+	}
+
+	.product .timer {
+		color: #363636;
+		font-weight: bold;
+		margin-right: 0px;
+		margin-left: -40px;
+	}
+
+	.product .timer:before {
+		content: "";
+		background-image: url('../img/Timer.png');
+		display: block;
+		width: 21px;
+		height: 21px;
+		position: absolute;
+		left: -10px;
+		top: 90px;
+	}
+
+	.product .coins {
+		color: #363636;
+		font-weight: bold;
+		margin-left: -40px;
+	}
+
+	.product .coins:before {
+		content: "";
+		background-image: url('../img/Coin.png');
+		display: block;
+		width: 22px;
+		height: 23px;
+		position: absolute;
+		left: 5px;
+		top: 111px;
+	}
+
+	.product ul {
+		list-style: none;	
+	}
+
+	.product ul li {
+		display: inline-block;
+	}
+
+	.parameters {
+		height: 10px;
+	}
+
+	.product hr {
+		margin-bottom: 10px;
+	}
+
+	.product h4 {
+		font-size: 11px;
+		display: block;
+		height: 230px;
+		width: 40px;
+	}
+
+	.product .price {
+		font-size: 15px;
+		color: #ff0000;
+		margin-top: 20px;
+	}
+
+	.product .old-price {
+		color: #bdbdbd;
+		text-decoration: line-through;
+		font-size: 10px;
+	}
+
+	.product .button-bid {
+		background-color: #fee15a;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+		color: #2e2e2f;
+		padding-top: 15px;
+		padding-bottom: 15px;
+		padding-left: 10px;
+		padding-right: 10px;
+		-webkit-box-shadow: 4px 4px 0px 0px rgba(208, 173, 75, 1);
+		-moz-box-shadow:    4px 4px 0px 0px rgba(208, 173, 75, 1);
+		box-shadow:         4px 4px 0px 0px rgba(208, 173, 75, 1);
+		font-size: 10px;
+		font-weight: bold;
+		margin-left: -10px;
+	}
+
+	.product .outbuy {
+		font-size: 10px;
+		/*text-align: center;*/
+	}
+
+
+	input[type=email] {
+		padding: 22px;
+		border-radius: 0px;
+		width: 150px!important;
+	}
+
+	form .button-green {
+		position: absolute;
+		top: 0;
+	}
+}

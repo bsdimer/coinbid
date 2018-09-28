@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+<f:view>
+    <ui:composition>
+
+        <h:panelGrid styleClass="grid" columns="2" cellpadding="5">
+            <p:outputLabel for="itemName" style="font-weight: bold" value="#{msg['common.name']}"/>
+            <p:autoComplete id="itemName" required="true" requiredMessage="#{msg['required.items.name']}"
+                            cache="true" cacheTimeout="6000"
+                            label="#{msg['common.item']}" panelStyle="width:600px"
+                            queryDelay="1000"
+                            value="#{itemController.itemInventory.item}"
+                            converter="#{itemConverter}"
+                            completeMethod="#{autoComplete.autoCompleteItem}" maxResults="10"
+                            var="item"
+                            itemValue="#{item}" itemLabel="#{item.name}"
+                            dropdown="true">
+
+                <p:ajax event="itemSelect" update="@form:centerContrainer" listener="#{itemController.onItemSelect}"/>
+
+                <p:column headerText="#{msg['common.name']}">
+                    #{item.name}
+                </p:column>
+
+                <p:column>
+                    Image
+                </p:column>
+
+                <p:column>
+                    #{item.retailPrice}
+                </p:column>
+            </p:autoComplete>
+
+            <p:outputLabel for="productNumber" style="font-weight: bold" value="#{msg['item.inventory.product.number']}"/>
+            <p:inputText id="productNumber" value="#{itemController.itemInventory.serialNumber}"
+                required="true" requiredMessage="#{msg['required.item.inventories.product.number']}">
+            </p:inputText>
+
+            <p:commandButton value="#{msg['common.register']}"
+                             action="#{itemController.createItemInventory}" update="@form:centerContrainer"/>
+            <p:commandButton value="#{msg['common.cancel']}"
+                             action="#{itemController.toggleAddItemInventoryPanel}" immediate="true" update="@form:centerContrainer"/>
+        </h:panelGrid>
+
+    </ui:composition>
+</f:view>
+</html>

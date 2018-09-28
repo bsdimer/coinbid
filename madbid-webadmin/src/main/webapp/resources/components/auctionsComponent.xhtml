@@ -1,0 +1,224 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html"
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:pe="http://primefaces.org/ui/extensions"
+              xmlns:components="http://java.sun.com/jsf/composite/components"
+              xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true" type="com.madbid.admin.controller.AuctionController"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:form>
+            <p:messages severity="warn, error" autoUpdate="true" showSummary="true"/>
+
+            <p:toolbar style="margin-bottom: 1em">
+                <f:facet name="left">
+                    <p:commandButton title="#{msg['common.add']}" value="#{msg['common.add']}" icon="ui-icon-clock"
+                                     process="@none"
+                                     update="@none"
+                                     oncomplete="PF('addNewAuctionDialog').show()"/>
+                    <p:separator/>
+                </f:facet>
+            </p:toolbar>
+
+            <p:dataTable id="auctionsTable_#{cc.attrs.uniqueIndex}" var="auction"
+                         value="#{cc.attrs.managedBean.auctions}"
+                         widgetVar="auctionsTable_#{cc.attrs.uniqueIndex}"
+                         resizableColumns="true" lazy="true" editable="true"
+                         sortMode="Single" sortBy="#{auction.id}" sortOrder="descending"
+                         styleClass="small-font" draggableColumns="true"
+                         rows="10" paginator="true" paginatorPosition="top" rowsPerPageTemplate="5,10,15"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg['common.results']}: {startRecord} - {endRecord} #{msg['common.from']} {totalRecords}, #{msg['common.page']}: {currentPage}/{totalPages}"
+                         emptyMessage="#{msg['common.no.auctions.found']}"
+                         filteredValue="#{cc.attrs.managedBean.filteredAuctions}">
+                <p:ajax event="rowEdit" listener="#{cc.attrs.managedBean.edit}"/>
+
+                <p:column filterBy="#{auction.id}" headerText="Id" sortBy="#{auction.id}">
+                    <h:outputText value="#{auction.id}"/>
+                </p:column>
+
+                <p:column filterBy="#{auction.startDateTime}" headerText="#{msg['common.start.datetime']}"
+                          sortBy="#{auction.startDateTime}">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText
+                                value="#{auction.startDateTime.toString('dd/MM/yyyy HH:mm:ss')}"/></f:facet>
+                        <f:facet name="input">
+                            <p:calendar value="#{auction.startDateTime}" pattern="dd/MM/yyyy HH:mm:ss"
+                                        navigator="true" converter="dateTimeConverter"
+                                        mindate="#{cc.attrs.managedBean.minDate}"
+                                        mode="popup" popupIconOnly="true"
+                                        required="true" requiredMessage="#{msg['required.auction.start.datetime']}"
+                                        style="width:100%"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column filterBy="#{auction.endDateTime}" headerText="#{msg['common.end.datetime']}"
+                          sortBy="#{auction.endDateTime}">
+                    <h:outputText value="#{auction.endDateTime.toString('dd/MM/yyyy HH:mm:ss')}"/>
+                </p:column>
+
+                <p:column filterBy="#{auction.auctionDuration}" headerText="#{msg['common.duration']}"
+                          sortBy="#{auction.auctionDuration}">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText for="durationEdit"
+                                                             value="#{auction.auctionDuration}"/></f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="durationEdit" value="#{auction.auctionDuration}"
+                                         required="true" requiredMessage="#{msg['required.auction.duration']}"
+                                         style="width:100%"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column filterBy="#{auction.creditsStep}" headerText="#{msg['common.credit.step']}"
+                          sortBy="#{auction.creditsStep}">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText for="creditStepEdit"
+                                                             value="#{auction.creditsStep}"/></f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="creditStepEdit" value="#{auction.creditsStep}"
+                                         required="true" requiredMessage="#{msg['required.auction.credit.step']}"
+                                         style="width:100%"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column filterBy="#{auction.startPrice}" headerText="#{msg['common.start.price']}"
+                          sortBy="#{auction.startPrice}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText for="startPriceEdit" value="#{auction.startPrice}"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="startPriceEdit" value="#{auction.startPrice}"
+                                         style="width:100%"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="auction value">
+                    <h:outputText value="#{cc.attrs.managedBean.auctionService.getAuctionValue(auction)}"/>
+                </p:column>
+
+                <p:column filterBy="#{auction.lastBidder.username}" headerText="lastBidder"
+                          sortBy="#{auction.lastBidder.username}">
+                    <h:outputText value="#{auction.lastBidder.username}"/>
+                </p:column>
+
+                <p:column headerText="toggle BB">
+                    <p:selectBooleanButton id="bbEnable_#{cc.attrs.uniqueIndex}" value="#{auction.enableBB}"
+                                           onLabel="Yes" offLabel="No"
+                                           onIcon="ui-icon-check" offIcon="ui-icon-close" style="width:60px">
+                        <p:ajax listener="#{cc.attrs.managedBean.toggleBB(auction)}"/>
+                    </p:selectBooleanButton>
+                </p:column>
+
+
+                <p:column filterBy="#{msg[auction.state]}" headerText="#{msg['common.state']}"
+                          sortBy="#{auction.state}">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText for="stateEdit"
+                                                             value="#{msg[auction.state]}"/></f:facet>
+                        <f:facet name="input">
+                            <p:selectOneMenu id="stateEdit" value="#{auction.state}" style="width:100%">
+                                <f:selectItems value="#{autoComplete.allAuctionStates}" var="state"
+                                               itemLabel="#{msg[state]}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column style="width:32px">
+                    <p:rowEditor/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog id="addNewAuctionDialog" header="#{msg['common.create.auction']}"
+                  widgetVar="addNewAuctionDialog"
+                  resizable="true" showEffect="fade" hideEffect="explode" style="width: 640px; height: auto"
+                  closeOnEscape="true">
+            <h:form>
+                <p:growl severity="info" autoUpdate="true" showSummary="true"/>
+                <p:messages id="formMessages_#{cc.attrs.uniqueIndex}" severity="warn, error" autoUpdate="true"
+                            showSummary="true"/>
+                <h:panelGrid id="addNewAuctionPanel_#{cc.attrs.uniqueIndex}" styleClass="grid" columns="4"
+                             cellpadding="5">
+                    <p:outputLabel for="duration_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                                   value="#{msg['common.duration']}"/>
+                    <p:inputText id="duration_#{cc.attrs.uniqueIndex}"
+                                 value="#{cc.attrs.managedBean.auction.auctionDuration}"
+                                 required="true"
+                                 requiredMessage="#{msg['required.auction.duration']}"/>
+
+                    <p:outputLabel for="creditsStep_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                                   value="#{msg['common.credit.step']}"/>
+                    <p:inputText id="creditsStep_#{cc.attrs.uniqueIndex}"
+                                 value="#{cc.attrs.managedBean.auction.creditsStep}"
+                                 required="true"
+                                 requiredMessage="#{msg['required.auction.credit.step']}"/>
+
+                    <p:outputLabel for="startPrice" style="font-weight: bold" value="#{msg['common.start.price']}"/>
+                    <p:inputText id="startPrice" value="#{cc.attrs.managedBean.auction.startPrice}"
+                                 onkeypress="allowOnlyNumeric(event)">
+                    </p:inputText>
+
+                    <h:outputText for="startDatetimeCalendar_#{cc.attrs.uniqueIndex}"
+                                  value="#{msg['common.start.datetime']}" style="font-weight: bold"/>
+                    <p:calendar id="startDatetimeCalendar_#{cc.attrs.uniqueIndex}"
+                                value="#{cc.attrs.managedBean.auction.startDateTime}" pattern="dd/MM/yyyy HH:mm:ss"
+                                navigator="true" converter="dateTimeConverter" mindate="#{cc.attrs.managedBean.minDate}"
+                                mode="popup" popupIconOnly="true" tabindex="7"
+                                required="true" requiredMessage="#{msg['required.auction.start.datetime']}"/>
+
+                    <p:outputLabel for="itemInventory" style="font-weight: bold" value="#{msg['common.item']}"/>
+                    <p:autoComplete id="itemInventory" required="true" requiredMessage="#{msg['required.item']}"
+                                    cache="true" cacheTimeout="6000"
+                                    label="#{msg['common.item']}"
+                                    queryDelay="1000"
+                                    value="#{cc.attrs.managedBean.auction.itemInventory}"
+                                    converter="#{itemInventoryConverter}"
+                                    completeMethod="#{autoComplete.autoCompleteItemInventoryByItemName}" maxResults="10"
+                                    var="itemInventory"
+                                    itemValue="#{itemInventory}" itemLabel="#{itemInventory.item.name}"
+                                    dropdown="true">
+
+                        <p:column headerText="#{msg['common.name']}">
+                            #{itemInventory.item.name}
+                        </p:column>
+
+                        <p:column headerText="#{msg['common.picture']}">
+                            <div style="text-align: center;">
+                                <p:graphicImage value="#{imageController.imageFromDB}" cache="false" width="100"
+                                                height="80">
+                                    <f:param name="imageId" value="#{itemInventory.item.defaultPicture.id}"/>
+                                </p:graphicImage>
+                            </div>
+                        </p:column>
+
+                        <p:column headerText="#{msg['item.inventory.product.number']}">
+                            #{itemInventory.serialNumber}
+                        </p:column>
+
+                        <p:column headerText="#{msg['item.retail.price']}">
+                            #{itemInventory.item.retailPrice}
+                        </p:column>
+                    </p:autoComplete>
+                    <p:spacer/><p:spacer/>
+                    <p:commandButton value="#{msg['common.create']}"
+                                     action="#{cc.attrs.managedBean.create}"
+                                     update="@form, @widgetVar(auctionsTable_#{cc.attrs.uniqueIndex})"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+    </composite:implementation>
+
+</ui:component>

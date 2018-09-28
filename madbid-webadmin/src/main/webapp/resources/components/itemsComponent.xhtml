@@ -1,0 +1,547 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html"
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:pe="http://primefaces.org/ui/extensions"
+              xmlns:components="http://java.sun.com/jsf/composite/components"
+              xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true"
+                             type="com.madbid.admin.controller.ItemController"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:outputStylesheet library="css" name="thunderbid.css"/>
+        <h:form id="itemComponentsForm_#{cc.attrs.uniqueIndex}">
+
+            <p:messages severity="warn, error" autoUpdate="true" showSummary="true"/>
+
+            <p:toolbar style="width: 70%">
+                <f:facet name="left">
+                    <p:commandButton title="#{msg['common.add.item']}" value="#{msg['common.add.item']}"
+                                     icon="ui-icon-cart"
+                                     process="@none"
+                                     update="@none"
+                                     oncomplete="PF('addNewItemDialog').show()"/>
+                    <p:separator/>
+                </f:facet>
+            </p:toolbar>
+
+            <p:dataTable id="itemsTable_#{cc.attrs.uniqueIndex}" var="item" value="#{cc.attrs.managedBean.items}"
+                         resizableColumns="true" lazy="true" selectionMode="single" style="width: 70%"
+                         selection="#{cc.attrs.managedBean.selectedItem}" rowKey="#{item.id}"
+                         editable="true" widgetVar="itemsTable_#{cc.attrs.uniqueIndex}"
+                         sortMode="Single" sortBy="#{item.id}" sortOrder="descending"
+                         styleClass="small-font" draggableColumns="true"
+                         rows="5" paginator="true" paginatorPosition="top"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg['common.results']}: {startRecord} - {endRecord} #{msg['common.from']} {totalRecords}, #{msg['common.page']}: {currentPage}/{totalPages}"
+                         emptyMessage="#{msg['common.no.items.found']}"
+                         filteredValue="#{cc.attrs.managedBean.filteredItems}">
+                <p:ajax event="rowEdit" listener="#{cc.attrs.managedBean.editItem}"/>
+                <p:ajax event="rowSelect"
+                        update="@form:itemsInventoryTable_#{cc.attrs.uniqueIndex}, @form:itemInventoryTB_#{cc.attrs.uniqueIndex}"/>
+
+                <f:facet name=" header">
+                    #{msg['common.items']}
+                </f:facet>
+
+                <p:column filterBy="#{item.id}" headerText="Id" sortBy="#{item.id}">
+                    <h:outputText value="#{item.id}"/>
+                </p:column>
+
+                <p:column filterBy="#{item.name}" headerText="#{msg['common.name']}" sortBy="#{item.name}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                <span style="display: inline-block; width: 100%; height: 100%">
+                    <h:outputText for="itemNameEdit" value="#{item.name}"/>
+                </span>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="itemNameEdit" value="#{item.name}" style="width:100%"
+                                         required="true" requiredMessage="#{msg['required.items.name']}"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <!--<p:column filterBy="#{item.description}" headerText="#{msg['common.description']}">-->
+                <!--<p:cellEditor>-->
+                <!--<f:facet name="output">-->
+                <!--<span style="display: inline-block; width: 100%; height: 100%">-->
+                <!--<h:outputText for="descriptionEdit"-->
+                <!--value="#{item.description}"/>-->
+                <!--</span>-->
+                <!--</f:facet>-->
+                <!--<f:facet name="input"><p:inputText id="descriptionEdit" value="#{item.description}"-->
+                <!--style="width:100%"/>-->
+                <!--</f:facet>-->
+                <!--</p:cellEditor>-->
+                <!--</p:column>-->
+
+                <p:column filterBy="#{item.retailPrice}" headerText="#{msg['item.retail.price']}"
+                          sortBy="#{item.retailPrice}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                <span style="display: inline-block; width: 100%; height: 100%">
+                    <h:outputText for="retailPriceEdit"
+                                  value="#{item.retailPrice}"/>
+                </span>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="retailPriceEdit" value="#{item.retailPrice}" immediate="true"
+                                         required="true" requiredMessage="#{msg['required.items.retail.price']}"
+                                         style="width:100%">
+                                <f:convertNumber minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                                                 minFractionDigits="2"/>
+                                <f:validateDoubleRange minimum="0.0"/>
+                            </p:inputText>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column filterBy="#{msg[item.retailPriceCurrency]}" headerText="#{msg['common.currency']}"
+                          sortBy="#{item.retailPriceCurrency}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                <span style="display: inline-block; width: 100%; height: 100%">
+                    <h:outputText for="retailPriceCurrency_#{cc.attrs.uniqueIndex}"
+                                  value="#{item.retailPriceCurrency}"/>
+                </span>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:selectOneMenu id="retailPriceCurrencySOM_#{cc.attrs.uniqueIndex}"
+                                             value="#{item.retailPriceCurrency}"
+                                             required="true" converter="currencyConverter"
+                                             requiredMessage="#{msg['required.items.retail.price.currency']}"
+                                             style="width:100%">
+                                <f:selectItems value="#{autoComplete.allCurrencies}" var="currency"
+                                               itemLabel="#{currency}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <!--<p:column filterBy="#{item.shippingPrice}" headerText="#{msg['item.shipping.price']}"
+                          sortBy="#{item.shippingPrice}">
+                    <h:outputText value="#{item.shippingPrice}"/>
+                </p:column>-->
+
+                <p:column headerText="#{msg['common.availability']}">
+                    <h:outputText value="#{item.getAvailableItemInventories().size()}"/>
+                </p:column>
+
+                <p:column width="50" headerText="#{msg['common.images']}">
+                    <h:panelGroup>
+                        <p:graphicImage id="img_#{cc.attrs.uniqueIndex}" name="images/images.png"
+                                        style="cursor:pointer" width="20" height="20"/>
+                        <p:overlayPanel id="imgPanel_#{cc.attrs.uniqueIndex}" for="img_#{cc.attrs.uniqueIndex}"
+                                        showEffect="blind" dynamic="true"
+                                        hideEffect="explode" showEvent="mouseover" hideEvent="mouseout"
+                                        dismissable="false" showCloseIcon="true">
+                            <p:imageSwitch effect="fade" style="width:300px;height:200px;">
+                                <ui:repeat value="#{item.pictures}" var="picture">
+                                    <p:graphicImage value="#{imageController.imageFromDB}" cache="false" width="100%"
+                                                    height="100%">
+                                        <f:param name="imageId" value="#{picture.id}"/>
+                                    </p:graphicImage>
+                                </ui:repeat>
+                            </p:imageSwitch>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column width="40">
+                    <p:commandButton oncomplete="PF('itemDetailsDialog_#{cc.attrs.uniqueIndex}').show()"
+                                     update="@form:itemDetailsPG_#{cc.attrs.uniqueIndex}"
+                                     actionListener="#{cc.attrs.managedBean.setSelectedItem(item)}"
+                                     icon="ui-icon-search" title="#{msg['common.details']}">
+                    </p:commandButton>
+                </p:column>
+
+                <p:column style="width:32px">
+                    <p:rowEditor/>
+                </p:column>
+            </p:dataTable>
+
+            <p:toolbar id="itemInventoryTB_#{cc.attrs.uniqueIndex}" style="margin-top: 1em; width: 70%">
+                <f:facet name="left">
+                    <p:commandButton title="#{msg['common.add.itemInventory']}"
+                                     value="#{msg['common.add.itemInventory']}"
+                                     icon="ui-icon-flag"
+                                     disabled="#{empty cc.attrs.managedBean.selectedItem}"
+                                     process="@none" update="@none"
+                                     oncomplete="PF('addNewItemInventoryDialog').show()"/>
+                    <p:separator/>
+                </f:facet>
+            </p:toolbar>
+
+
+            <p:dataTable id="itemsInventoryTable_#{cc.attrs.uniqueIndex}" var="itemIneventory" style="width: 70%"
+                         value="#{cc.attrs.managedBean.itemInventories}" scrollable="true" liveScroll="true"
+                         scrollHeight="250"
+                         resizableColumns="true" selectionMode="single" scrollRows="18"
+                         selection="#{cc.attrs.managedBean.selectedItemIneventory}" rowKey="#{itemIneventory.id}"
+                         sortMode="Single" sortBy="#{itemIneventory.id}" sortOrder="descending"
+                         editable="true" widgetVar="itemsInventoryTable_#{cc.attrs.uniqueIndex}"
+                         draggableColumns="true" emptyMessage="#{msg['common.no.item.inventories.found']}"
+                         filteredValue="#{cc.attrs.managedBean.filteredItemInventories}">
+                <p:ajax event="rowEdit" listener="#{cc.attrs.managedBean.editItemInventory}"
+                        update="@widgetVar(itemsTable_#{cc.attrs.uniqueIndex})"/>
+
+                <f:facet name="header">
+                    #{msg['common.itemInventories']}
+                </f:facet>
+
+                <p:column filterBy="#{itemIneventory.id}" headerText="Id" sortBy="#{itemIneventory.id}">
+                    <h:outputText value="#{itemIneventory.id}"/>
+                </p:column>
+
+                <p:column filterBy="#{itemIneventory.serialNumber}" headerText="#{msg['item.inventory.product.number']}"
+                          sortBy="#{itemIneventory.serialNumber}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                <span style="display: inline-block; width: 100%; height: 100%">
+                    <h:outputText for="productNumberEdit" value="#{itemIneventory.serialNumber}"/>
+                </span>
+                        </f:facet>
+                        <f:facet name="input"><p:inputText id="productNumberEdit" value="#{itemIneventory.serialNumber}"
+                                                           required="true"
+                                                           requiredMessage="#{msg['required.item.inventories.serial.number']}"
+                                                           style="width:100%"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column filterBy="#{itemIneventory.costPrice}" headerText="#{msg['common.costPrice']}"
+                          sortBy="#{itemIneventory.costPrice}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                <span style="display: inline-block; width: 100%; height: 100%">
+                    <h:outputText for="costPriceEditor_#{cc.attrs.uniqueIndex}"
+                                  value="#{itemIneventory.costPrice}"/>
+                </span>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="costPriceEditor_#{cc.attrs.uniqueIndex}"
+                                         value="#{itemIneventory.costPrice}"
+                                         immediate="true" required="true"
+                                         requiredMessage="#{msg['required.item.inventories.cost.price']}"
+                                         style="width:100%">
+                                <f:convertNumber minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                                                 minFractionDigits="2"/>
+                                <f:validateDoubleRange minimum="0.0"/>
+                            </p:inputText>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column filterBy="#{msg[itemIneventory.costPriceCurrency]}" headerText="#{msg['common.currency']}"
+                          sortBy="#{itemIneventory.costPriceCurrency}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                <span style="display: inline-block; width: 100%; height: 100%">
+                    <h:outputText for="costPriceCurrencySOM_#{cc.attrs.uniqueIndex}"
+                                  value="#{itemIneventory.costPriceCurrency}"/>
+                </span>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:selectOneMenu id="costPriceCurrencySOM_#{cc.attrs.uniqueIndex}"
+                                             value="#{itemIneventory.costPriceCurrency}"
+                                             required="true" converter="currencyConverter"
+                                             requiredMessage="#{msg['required.items.retail.price.currency']}"
+                                             style="width:100%">
+                                <f:selectItems value="#{autoComplete.allCurrencies}" var="currency"
+                                               itemLabel="#{currency}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column filterBy="#{msg[itemIneventory.state]}" headerText="#{msg['common.inventoryState']}"
+                          sortBy="#{itemIneventory.state}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                <span style="display: inline-block; width: 100%; height: 100%">
+                    <h:outputText for="itemIneventoryStateSOM_#{cc.attrs.uniqueIndex}"
+                                  value="#{msg[itemIneventory.state]}"/>
+                </span>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:selectOneMenu id="itemIneventoryStateSOM_#{cc.attrs.uniqueIndex}"
+                                             value="#{itemIneventory.state}"
+                                             style="width:100%">
+                                <f:selectItems value="#{autoComplete.allItemInventoryStates}" var="inventoryState"
+                                               itemLabel="#{msg[inventoryState]}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column style="width:32px">
+                    <p:rowEditor/>
+                </p:column>
+
+            </p:dataTable>
+
+
+            <p:dialog id="itemDetailsDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+                      widgetVar="itemDetailsDialog_#{cc.attrs.uniqueIndex}"
+                      resizable="true" showEffect="fade" hideEffect="explode"
+                      style="max-width: 60%; height: auto; max-height: 80%"
+                      closeOnEscape="true">
+                <h:panelGrid id="itemDetailsPG_#{cc.attrs.uniqueIndex}" styleClass="grid" columns="1">
+
+                    <h:panelGrid columns="2">
+                        <p:outputLabel style="font-weight: bold"
+                                       value="#{msg['common.name']}"/>
+                        <p:outputLabel value="#{cc.attrs.managedBean.selectedItem.name}"/>
+
+                        <p:outputLabel value="#{msg['common.retailPrice']}" style="font-weight: bold"/>
+                        <p:outputLabel value="#{cc.attrs.managedBean.selectedItem.retailPrice}"/>
+
+                        <p:outputLabel value="#{msg['common.currency']}" style="font-weight: bold"/>
+                        <p:outputLabel value="#{cc.attrs.managedBean.selectedItem.retailPriceCurrency}"/>
+                    </h:panelGrid>
+
+                    <h:panelGroup id="imagesPanelGroup_#{cc.attrs.uniqueIndex}">
+                        <p:commandButton onclick="PF('switcher').previous();"
+                                         actionListener="#{cc.attrs.managedBean.selectPictureIndex(-1)}"
+                                         disabled="#{cc.attrs.managedBean.selectedItem.pictures.size() lt 2}"
+                                         ajax="true"
+                                         icon="ui-icon-circle-triangle-w" id="prev"/>
+                        <p:commandButton onclick="PF('switcher').next();"
+                                         actionListener="#{cc.attrs.managedBean.selectPictureIndex(1)}"
+                                         disabled="#{cc.attrs.managedBean.selectedItem.pictures.size() lt 2}"
+                                         ajax="true"
+                                         icon="ui-icon-circle-triangle-e" id="next"/>
+                        <p:commandButton id="deleteUserLink" icon="ui-icon-trash"
+                                         disabled="#{cc.attrs.managedBean.selectedItem.pictures.size() lt 1}"
+                                         action="#{cc.attrs.managedBean.deletePicture()}"
+                                         update="itemDetailsPG_#{cc.attrs.uniqueIndex}"/>
+                        <p:inplace label="#{msg['common.add.picture']}" effect="slide">
+                            <p:fileUpload fileUploadListener="#{cc.attrs.managedBean.handleFileUploadAndSave}"
+                                          mode="advanced"
+                                          label="#{msg['common.choose.picture']}"
+                                          dragDropSupport="false" multiple="true"
+                                          sizeLimit="100000000"
+                                          allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
+                                          update="imagesPanelGroup_#{cc.attrs.uniqueIndex}"/>
+                        </p:inplace>
+                        <p:imageSwitch widgetVar="switcher" effect="fade" slideshowAuto="false"
+                                       rendered="#{not empty cc.attrs.managedBean.selectedItem.pictures}"
+                                       style="width:300px;height:200px;">
+                            <ui:repeat value="#{cc.attrs.managedBean.selectedItem.pictures}" var="picture">
+                                <p:graphicImage value="#{imageController.imageFromDB}" cache="false" width="100%"
+                                                height="100%">
+                                    <f:param name="imageId" value="#{picture.id}"/>
+                                </p:graphicImage>
+                            </ui:repeat>
+                        </p:imageSwitch>
+                    </h:panelGroup>
+
+                    <h:panelGrid id="desciptionEditorPanelGroup_#{cc.attrs.uniqueIndex}" columns="1">
+                        <p:outputLabel value="short description"/>
+                        <p:inputTextarea widgetVar="descriptionEditor" cols="60" rows="10"
+                                         value="#{cc.attrs.managedBean.itemShortDescription}"/>
+                    </h:panelGrid>
+
+                    <h:panelGroup id="longDesciptionEditorPanelGroup_#{cc.attrs.uniqueIndex}">
+                        <p:outputLabel value="long description"/>
+                        <p:editor widgetVar="longDescriptionEditor"
+                                  value="#{cc.attrs.managedBean.itemLongDescription}"/>
+                    </h:panelGroup>
+
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="#{msg['common.save']}" icon="ui-icon-disk"
+                                         action="#{cc.attrs.managedBean.updateItem}"
+                                         update="@form, @widgetVar(itemsTable_#{cc.attrs.uniqueIndex})"/>
+                        <p:commandButton value="Clear" type="button" onclick="PF('descriptionEditor').clear();"
+                                         icon="ui-icon-close"/>
+                    </h:panelGrid>
+
+                </h:panelGrid>
+            </p:dialog>
+
+        </h:form>
+
+        <!--<p:panel id="addItemPanel" rendered="#{cc.attrs.managedBean.addItem}">
+            <ui:include src="itemsFormParts/addItem.xhtml">
+                <ui:param name="managedBean" value="#{cc.attrs.managedBean}"/>
+                <ui:param name="uniqueIndex" value="#{cc.attrs.uniqueIndex}"/>
+            </ui:include>
+        </p:panel>
+        <p:commandButton value="#{msg['item.create']}" actionListener="#{cc.attrs.managedBean.toggleAddItemPanel}"
+                         immediate="true" ajax="true" update="@form"
+                         rendered="#{!cc.attrs.managedBean.addItem and !cc.attrs.managedBean.addItemInventory}"/>
+        <p:panel id="itemInventoriesTablePanel"
+                 rendered="#{!cc.attrs.managedBean.addItem and !cc.attrs.managedBean.addItemInventory}"
+                 styleClass="panel-component">
+            <ui:include src="itemsFormParts/itemInventoriesTable.xhtml">
+                <ui:param name="managedBean" value="#{cc.attrs.managedBean}"/>
+                <ui:param name="uniqueIndex" value="#{cc.attrs.uniqueIndex}"/>
+            </ui:include>
+        </p:panel>
+        <p:panel id="addItemInventoryPanel" rendered="#{cc.attrs.managedBean.addItemInventory}">
+            <ui:include src="itemsFormParts/addItemInventory.xhtml">
+                <ui:param name="managedBean" value="#{cc.attrs.managedBean}"/>
+                <ui:param name="uniqueIndex" value="#{cc.attrs.uniqueIndex}"/>
+            </ui:include>
+        </p:panel>
+        <p:commandButton value="#{msg['item.inventory.register']}"
+                         actionListener="#{cc.attrs.managedBean.toggleAddItemInventoryPanel}"
+                         immediate="true" ajax="true" update="@form"
+                         rendered="#{!cc.attrs.managedBean.addItem and !cc.attrs.managedBean.addItemInventory}"/>-->
+
+
+        <p:dialog id="addNewItemDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.addNewItem']}"
+                  widgetVar="addNewItemDialog"
+                  resizable="true" showEffect="fade" hideEffect="explode" style="width: auto; height: auto"
+                  closeOnEscape="true">
+            <h:form>
+                <p:growl severity="info" autoUpdate="true" showSummary="true"/>
+                <p:messages id="addNewItemMessages_#{cc.attrs.uniqueIndex}" severity="warn, error" autoUpdate="true"
+                            showSummary="true"/>
+                <h:panelGrid styleClass="grid" columns="2">
+                    <p:outputLabel for="name_#{cc.attrs.uniqueIndex}" style="font-weight: bold"
+                                   value="#{msg['common.name']}"/>
+                    <p:inputText id="name_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.item.name}"
+                                 required="true"
+                                 requiredMessage="#{msg['required.items.name']}"/>
+
+                    <p:outputLabel for="retailPrice_#{cc.attrs.uniqueIndex}" value="#{msg['common.retailPrice']}"
+                                   style="font-weight: bold"/>
+                    <p:inputText id="retailPrice_#{cc.attrs.uniqueIndex}"
+                                 value="#{cc.attrs.managedBean.item.retailPrice}"
+                                 required="true" requiredMessage="#{msg['required.items.retail.price']}"
+                                 onkeypress="allowOnlyNumeric(event)">
+                        <!--<p:ajax update="addNewItemMessages_#{cc.attrs.uniqueIndex}" event="keyup"/>-->
+                        <!--<f:convertNumber minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"-->
+                        <!--minFractionDigits="2"/>-->
+                        <!--<f:validateDoubleRange minimum="0.0"/>-->
+                    </p:inputText>
+
+                    <p:outputLabel value="#{msg['common.currency']}" style="font-weight: bold"/>
+                    <p:selectOneMenu id="coinsCurrency_#{cc.attrs.uniqueIndex}" converter="currencyConverter"
+                                     value="#{cc.attrs.managedBean.item.retailPriceCurrency}">
+                        <f:selectItems value="#{autoComplete.allCurrencies}" var="currency"
+                                       itemValue="#{currency}"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+                <p:accordionPanel styleClass="accordion-without-padding">
+                    <p:tab title="short HTML description">
+                        <p:inputTextarea id="description_#{cc.attrs.uniqueIndex}" widgetVar="descriptionWidget"
+                                         value="#{cc.attrs.managedBean.item.description}"
+                                         cols="60" rows="10"/>
+                    </p:tab>
+
+                    <p:tab title="long HTML description">
+                        <p:editor id="longDescription_#{cc.attrs.uniqueIndex}" widgetVar="longDescriptionWidget"
+                                  value="#{cc.attrs.managedBean.item.longDescription}"
+                                  width="800"/>
+                    </p:tab>
+
+                    <p:tab title="#{msg['common.pictures']}">
+
+                        <h:panelGrid id="fileUploadGridPanel_#{cc.attrs.uniqueIndex}" columns="1"
+                                     styleClass="panel-without-padding">
+
+                            <p:fileUpload fileUploadListener="#{cc.attrs.managedBean.handleFileUpload}" mode="advanced"
+                                          label="#{msg['common.choose.picture']}"
+                                          dragDropSupport="false" multiple="true" auto="true"
+                                          sizeLimit="100000000" styleClass="thunderbid-file-upload"
+                                          allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
+                                          update="fileUploadContent_#{cc.attrs.uniqueIndex}"/>
+
+                            <p:panel id="fileUploadContent_#{cc.attrs.uniqueIndex}" columns="1"
+                                     styleClass="ui-fileupload-content ui-widget-content ui-corner-bottom">
+                                <p:messages id="fileUploadMessages_#{cc.attrs.uniqueIndex}" autoUpdate="true"/>
+                                <p:dataTable id="itemPicturesTable_#{cc.attrs.uniqueIndex}" var="pictureData"
+                                             styleClass="ui-fileupload-files pictures-table" style="width: 600px;"
+                                             value="#{imageController.picturesData}" emptyMessage="">
+
+                                    <p:column width="55">
+                                        <p:graphicImage value="#{imageController.image}" cache="false" width="50"
+                                                        height="50">
+                                            <f:param name="imageId" value="#{pictureData.identifier}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText id="filenameColumn_#{cc.attrs.uniqueIndex}"
+                                                      value="#{pictureData.filename}"/>
+                                        <p:tooltip id="filenameTooltip_#{cc.attrs.uniqueIndex}"
+                                                   for="filenameColumn_#{cc.attrs.uniqueIndex}" trackMouse="true"
+                                                   value="#{pictureData.filename}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{pictureData.readableFileSize()}"/>
+                                    </p:column>
+                                    <p:column width="20">
+                                        <p:commandButton icon="ui-icon-close"
+                                                         actionListener="#{imageController.removePictureData(pictureData.identifier)}"
+                                                         update="itemPicturesTable_#{cc.attrs.uniqueIndex}"
+                                                         ajax="true" immediate="true"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:panel>
+                        </h:panelGrid>
+                    </p:tab>
+                </p:accordionPanel>
+                <p:commandButton value="#{msg['common.create']}"
+                                 action="#{cc.attrs.managedBean.createItem}"
+                                 update="@form, @widgetVar(itemsTable_#{cc.attrs.uniqueIndex})"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="addNewItemInventoryDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.add.itemInventory']}"
+                  widgetVar="addNewItemInventoryDialog"
+                  resizable="true" showEffect="fade" hideEffect="explode" style="width: auto; height: auto"
+                  closeOnEscape="true">
+            <h:form>
+                <p:growl severity="info" autoUpdate="true" showSummary="true"/>
+                <p:messages id="addNewItemInevntoryMessages_#{cc.attrs.uniqueIndex}" severity="warn, error"
+                            autoUpdate="true" showSummary="true"/>
+                <h:panelGrid styleClass="grid" columns="2">
+                    <p:outputLabel for="costPrice_#{cc.attrs.uniqueIndex}" value="#{msg['common.costPrice']}"
+                                   style="font-weight: bold"/>
+                    <p:inputText id="costPrice_#{cc.attrs.uniqueIndex}"
+                                 value="#{cc.attrs.managedBean.itemInventory.costPrice}"
+                                 required="true" requiredMessage="#{msg['required.item.inventories.cost.price']}"
+                                 onkeypress="allowOnlyNumeric(event)">
+                        <!--<p:ajax update="addNewItemInevntoryMessages_#{cc.attrs.uniqueIndex}" event="keyup"/>-->
+                        <!--<f:convertNumber minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"-->
+                        <!--minFractionDigits="2"/>-->
+                        <!--<f:validateDoubleRange minimum="0.0"/>-->
+                    </p:inputText>
+
+                    <p:outputLabel for="costPriceCurrency_#{cc.attrs.uniqueIndex}" value="#{msg['common.currency']}"
+                                   style="font-weight: bold"/>
+                    <p:selectOneMenu id="costPriceCurrency_#{cc.attrs.uniqueIndex}" converter="currencyConverter"
+                                     value="#{cc.attrs.managedBean.itemInventory.costPriceCurrency}">
+                        <f:selectItems value="#{autoComplete.allCurrencies}" var="currency"
+                                       itemValue="#{currency}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="productNumber_#{cc.attrs.uniqueIndex}" value="#{msg['common.serialNumber']}"
+                                   style="font-weight: bold"/>
+                    <p:inputText id="productNumber_#{cc.attrs.uniqueIndex}"
+                                 value="#{cc.attrs.managedBean.itemInventory.serialNumber}"
+                                 required="true" requiredMessage="#{msg['required.item.inventories.serial.number']}">
+                    </p:inputText>
+
+                    <p:outputLabel/>
+                    <p:commandButton value="#{msg['common.create']}"
+                                     action="#{cc.attrs.managedBean.createItemInventory()}"
+                                     update="@form, @widgetVar(itemsInventoryTable_#{cc.attrs.uniqueIndex}), @widgetVar(itemsTable_#{cc.attrs.uniqueIndex})"/>
+
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+
+
+    </composite:implementation>
+
+</ui:component>
